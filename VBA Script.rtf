@@ -1,135 +1,126 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2513
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+Sub WallStreet_test()
 
-\f0\fs24 \cf0 Sub WallStreet_test()\
-\
-    'Set an initial variable for holding the Ticker_Name\
-    Dim Ticker_Name As String\
-\
-    ' Set an initial variable for holding the Ticker opening value, closing value, Total_Stock_Volume, LastRow\
-    Dim Opening_value As Double\
-    Dim Closing_value As Double\
-    Dim Total_Stock_Volume As Double\
-    Dim LastRow As Double\
-\
-    'Set the initial stock volume for a ticker to 0\
-    Total_Stock_Volume = 0\
-  \
-    'Set the header for the Summary table\
-    Range("I1").Value = "Ticker"\
-    Range("J1").Value = "Yearly Change"\
-    Range("K1").Value = "Percentage Change"\
-    Range("L1").Value = "Total Stock Volume"\
-    Range("T1").Value = "Closing Value"\
-    Range("U1").Value = "Opening Value"\
-    Range("O2").Value = "Greatest % Increase"\
-    Range("O3").Value = "Greatest % Decrease"\
-    Range("O4").Value = "Greatest Total Volume"\
-    Range("P1").Value = "Ticker"\
-    Range("Q1").Value = "Value"\
-\
-  ' Keep track of the location for each Ticker in the summary table\
-    Dim Summary_Table_Row As Integer\
-    Summary_Table_Row = 2\
-    \
-    ' Get the first opening value from the sheet\
-    Range("U" & Summary_Table_Row).Value = Cells(2, 3).Value\
-  \
-  ' Determine the Last Row\
-    LastRow = Cells(Rows.Count, 1).End(xlUp).Row\
-\
-  ' Loop through all the ticker data\
-  For i = 2 To LastRow\
-\
-    ' Check if we are still within the same ticker, if it is not...\
-    If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then\
-\
-      ' Set the Ticker name\
-      Ticker_Name = Cells(i, 1).Value\
-      \
-      'Set the closing value for the ticker when it changes to the next ticker\
-      Closing_value = Cells(i, 6).Value\
-      Opening_value = Cells(i + 1, 3).Value\
-      ' Add to the Total_Stock_Volume\
-      Total_Stock_Volume = Total_Stock_Volume + Cells(i, 7).Value\
-\
-      ' Print the Ticker Name in the Summary Table\
-      Range("I" & Summary_Table_Row).Value = Ticker_Name\
-      \
-      ' Print the Closing value in the Summary Table\
-      Range("T" & Summary_Table_Row).Value = Closing_value\
-      \
-       ' Print the Opening value in the Summary Table\
-      Range("U" & Summary_Table_Row + 1).Value = Opening_value\
-\
-      ' Print the Total Stock volume on the Summary Table\
-      Range("L" & Summary_Table_Row).Value = Total_Stock_Volume\
-      \
-      ' Add one to the summary table row\
-      Summary_Table_Row = Summary_Table_Row + 1\
-      \
-      ' Reset the Total Stock volume\
-      Total_Stock_Volume = 0\
-\
-    ' If the cell immediately following a row is the same ticker...\
-    Else\
-\
-      ' Add to the Stock Volume\
-      Total_Stock_Volume = Total_Stock_Volume + Cells(i, 7).Value\
-      \
-    End If\
-    \
-  Next i\
-  \
-  'Loop through the summary table to get the yearly change and percentage change\
-  For i = 2 To Summary_Table_Row\
-  \
-            'Get the greatest total volume, the row corresponding to the greatest volume and the corresponding ticker\
-            Set Total_volume_range = Range("L2" & ":L" & Summary_Table_Row)\
-            Total_volume_range_max = WorksheetFunction.Max(Total_volume_range)\
-            Range("Q4").Value = Total_volume_range_max\
-            Total_volume_range_max_row = WorksheetFunction.Match(Total_volume_range_max, Total_volume_range, 0) + Total_volume_range.Row - 1\
-            Range("P4").Value = Range("I" & Total_volume_range_max_row)\
-\
-  \
-  'check to ensure the opening stock value is not zero as the denominator of the fraction cannot be zero, exit the for loop if it is zero\
-    If Cells(i, 21).Value <> 0 Then\
-     'Print the Yearly Change in the Summary Table\
-        Cells(i, 10).Value = Cells(i, 20).Value - Cells(i, 21).Value\
-      \
-      'Print the percentage change\
-        Cells(i, 11).Value = Round((Cells(i, 10).Value / Cells(i, 21).Value) * 100, 2)\
-        \
-         'Get the greatest % increase, the row corresponding to the greatest % increase and the corresponding ticker\
-            Set Yearly_change_range = Range("K2" & ":K" & Summary_Table_Row)\
-            Yearly_change_range_max = WorksheetFunction.Max(Yearly_change_range)\
-            Range("Q2").Value = Yearly_change_range_max\
-            Yearly_change_range_max_row = WorksheetFunction.Match(Yearly_change_range_max, Yearly_change_range, 0) + Yearly_change_range.Row - 1\
-            Range("P2").Value = Range("I" & Yearly_change_range_max_row)\
-            \
-             'Get the greatest % Decrease, the row corresponding to the greatest % decrease and the corresponding ticker\
-            Set Yearly_change_range = Range("K2" & ":K" & Summary_Table_Row)\
-            Yearly_change_range_min = WorksheetFunction.Min(Yearly_change_range)\
-            Range("Q3").Value = Yearly_change_range_min\
-            Yearly_change_range_min_row = WorksheetFunction.Match(Yearly_change_range_min, Yearly_change_range, 0) + Yearly_change_range.Row - 1\
-            Range("P3").Value = Range("I" & Yearly_change_range_min_row)\
-    \
-        'conditional formatting that highlights positive change in green and negative change in red.\
-            If Cells(i, 11).Value < 0 Then\
-            Cells(i, 11).Interior.ColorIndex = 3\
-            Else\
-            Cells(i, 11).Interior.ColorIndex = 4\
-            End If\
-    Else\
-       Exit For\
-    End If\
-    \
-   Next i\
-\
-End Sub\
-\
-}
+    'Set an initial variable for holding the Ticker_Name
+    Dim Ticker_Name As String
+
+    ' Set an initial variable for holding the Ticker opening value, closing value, Total_Stock_Volume, LastRow
+    Dim Opening_value As Double
+    Dim Closing_value As Double
+    Dim Total_Stock_Volume As Double
+    Dim LastRow As Double
+
+    'Set the initial stock volume for a ticker to 0
+    Total_Stock_Volume = 0
+  
+    'Set the header for the Summary table
+    Range("I1").Value = "Ticker"
+    Range("J1").Value = "Yearly Change"
+    Range("K1").Value = "Percentage Change"
+    Range("L1").Value = "Total Stock Volume"
+    Range("T1").Value = "Closing Value"
+    Range("U1").Value = "Opening Value"
+    Range("O2").Value = "Greatest % Increase"
+    Range("O3").Value = "Greatest % Decrease"
+    Range("O4").Value = "Greatest Total Volume"
+    Range("P1").Value = "Ticker"
+    Range("Q1").Value = "Value"
+
+  ' Keep track of the location for each Ticker in the summary table
+    Dim Summary_Table_Row As Integer
+    Summary_Table_Row = 2
+    
+    ' Get the first opening value from the sheet
+    Range("U" & Summary_Table_Row).Value = Cells(2, 3).Value
+  
+  ' Determine the Last Row
+    LastRow = Cells(Rows.Count, 1).End(xlUp).Row
+
+  ' Loop through all the ticker data
+  For i = 2 To LastRow
+
+    ' Check if we are still within the same ticker, if it is not...
+    If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+
+      ' Set the Ticker name
+      Ticker_Name = Cells(i, 1).Value
+      
+      'Set the closing value for the ticker when it changes to the next ticker
+      Closing_value = Cells(i, 6).Value
+      Opening_value = Cells(i + 1, 3).Value
+      ' Add to the Total_Stock_Volume
+      Total_Stock_Volume = Total_Stock_Volume + Cells(i, 7).Value
+
+      ' Print the Ticker Name in the Summary Table
+      Range("I" & Summary_Table_Row).Value = Ticker_Name
+      
+      ' Print the Closing value in the Summary Table
+      Range("T" & Summary_Table_Row).Value = Closing_value
+      
+       ' Print the Opening value in the Summary Table
+      Range("U" & Summary_Table_Row + 1).Value = Opening_value
+
+      ' Print the Total Stock volume on the Summary Table
+      Range("L" & Summary_Table_Row).Value = Total_Stock_Volume
+      
+      ' Add one to the summary table row
+      Summary_Table_Row = Summary_Table_Row + 1
+      
+      ' Reset the Total Stock volume
+      Total_Stock_Volume = 0
+
+    ' If the cell immediately following a row is the same ticker...
+    Else
+
+      ' Add to the Stock Volume
+      Total_Stock_Volume = Total_Stock_Volume + Cells(i, 7).Value
+      
+    End If
+    
+  Next i
+  
+  'Loop through the summary table to get the yearly change and percentage change
+  For i = 2 To Summary_Table_Row
+  
+            'Get the greatest total volume, the row corresponding to the greatest volume and the corresponding ticker
+            Set Total_volume_range = Range("L2" & ":L" & Summary_Table_Row)
+            Total_volume_range_max = WorksheetFunction.Max(Total_volume_range)
+            Range("Q4").Value = Total_volume_range_max
+            Total_volume_range_max_row = WorksheetFunction.Match(Total_volume_range_max, Total_volume_range, 0) + Total_volume_range.Row - 1
+            Range("P4").Value = Range("I" & Total_volume_range_max_row)
+
+  
+  'check to ensure the opening stock value is not zero as the denominator of the fraction cannot be zero, exit the for loop if it is zero
+    If Cells(i, 21).Value <> 0 Then
+     'Print the Yearly Change in the Summary Table
+        Cells(i, 10).Value = Cells(i, 20).Value - Cells(i, 21).Value
+      
+      'Print the percentage change
+        Cells(i, 11).Value = Round((Cells(i, 10).Value / Cells(i, 21).Value) * 100, 2)
+        
+         'Get the greatest % increase, the row corresponding to the greatest % increase and the corresponding ticker
+            Set Yearly_change_range = Range("K2" & ":K" & Summary_Table_Row)
+            Yearly_change_range_max = WorksheetFunction.Max(Yearly_change_range)
+            Range("Q2").Value = Yearly_change_range_max
+            Yearly_change_range_max_row = WorksheetFunction.Match(Yearly_change_range_max, Yearly_change_range, 0) + Yearly_change_range.Row - 1
+            Range("P2").Value = Range("I" & Yearly_change_range_max_row)
+            
+             'Get the greatest % Decrease, the row corresponding to the greatest % decrease and the corresponding ticker
+            Set Yearly_change_range = Range("K2" & ":K" & Summary_Table_Row)
+            Yearly_change_range_min = WorksheetFunction.Min(Yearly_change_range)
+            Range("Q3").Value = Yearly_change_range_min
+            Yearly_change_range_min_row = WorksheetFunction.Match(Yearly_change_range_min, Yearly_change_range, 0) + Yearly_change_range.Row - 1
+            Range("P3").Value = Range("I" & Yearly_change_range_min_row)
+    
+        'conditional formatting that highlights positive change in green and negative change in red.
+            If Cells(i, 11).Value < 0 Then
+            Cells(i, 11).Interior.ColorIndex = 3
+            Else
+            Cells(i, 11).Interior.ColorIndex = 4
+            End If
+    Else
+       Exit For
+    End If
+    
+   Next i
+
+End Sub
